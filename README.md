@@ -1,15 +1,14 @@
--- 🌍 Speed Boost GUI completo com notificações, tags e controle PC/Mobile
+-- 🌍 Leviathan Hub Speed Boost GUI Completo para Executor
+
 local Players = game:GetService("Players")
 local RunService = game:GetService("RunService")
 local UserInputService = game:GetService("UserInputService")
 local StarterGui = game:GetService("StarterGui")
 
 local player = Players.LocalPlayer
+local OWNER_USERID = 5572753034 -- Coloque seu UserID aqui
 
--- CONFIGURAÇÃO DO DONO
-local OWNER_USERID = 5572753034 -- Seu UserId
-
--- Função para criar notificações estilo Roblox
+-- Função de notificações estilo Roblox
 local function notificar(msg, tempo)
     StarterGui:SetCore("SendNotification", {
         Title = "Leviathan Hub";
@@ -18,7 +17,55 @@ local function notificar(msg, tempo)
     })
 end
 
--- ===== Função de criar GUI =====
+-- Função para criar a tag Owner/User na cabeça
+local function criarTag()
+    local char = player.Character
+    if not char then return end
+    local head = char:FindFirstChild("Head")
+    if not head then return end
+
+    if head:FindFirstChild("HubTag") then head.HubTag:Destroy() end
+
+    local billboard = Instance.new("BillboardGui")
+    billboard.Name = "HubTag"
+    billboard.Size = UDim2.new(0,200,0,50)
+    billboard.StudsOffset = Vector3.new(0,2.5,0)
+    billboard.AlwaysOnTop = true
+    billboard.Parent = head
+
+    local text = Instance.new("TextLabel")
+    text.Size = UDim2.new(1,0,1,0)
+    text.BackgroundTransparency = 1
+    text.Font = Enum.Font.GothamBold
+    text.TextSize = 18
+    text.TextStrokeTransparency = 0.5
+    text.Parent = billboard
+
+    if player.UserId == OWNER_USERID then
+        text.Text = "👑 Owner 👑"
+        text.TextColor3 = Color3.fromRGB(255,215,0)
+    else
+        text.Text = "📜 User 📜"
+        text.TextColor3 = Color3.fromRGB(200,200,255)
+    end
+end
+
+-- Garante que o Character esteja pronto
+if player.Character and player.Character:FindFirstChild("Head") then
+    criarTag()
+else
+    player.CharacterAdded:Connect(function()
+        task.wait(1)
+        criarTag()
+    end)
+end
+
+-- ===== ESPERA E NOTIFICAÇÃO DE EXECUÇÃO =====
+notificar("✔️ Seu Hub está sendo executado 🌿", 2)
+task.wait(2)
+notificar("📜 Seu Hub está pronto ✔️", 2)
+
+-- ===== CRIAR GUI =====
 local function criarGUI()
     local playerGui = player:WaitForChild("PlayerGui")
 
@@ -107,7 +154,6 @@ local function criarGUI()
     status.TextYAlignment = Enum.TextYAlignment.Center
     status.Parent = panel
 
-    -- ===== TEXTO VELOCIDADE =====
     local speedStatus = Instance.new("TextLabel")
     speedStatus.Name = "SpeedStatus"
     speedStatus.Size = UDim2.new(1, -16, 0, 20)
@@ -256,7 +302,6 @@ local function criarGUI()
     if isMobile and hubBtn then
         hubBtn.MouseButton1Click:Connect(toggleHub)
     else
-        -- PC: L ou K
         UserInputService.InputBegan:Connect(function(input, gpe)
             if gpe then return end
             if input.UserInputType == Enum.UserInputType.Keyboard then
@@ -274,6 +319,11 @@ local function criarGUI()
         local color = Color3.fromHSV(hue, 0.9, 0.9)
         stroke.Color = color
         if hubBtn then hubBtn.UIStroke.Color = color end
+        sliderValue.TextColor3 = color
+    end)
+end
+
+criarGUI() color end
         sliderValue.TextColor3 = color
     end)
 end
